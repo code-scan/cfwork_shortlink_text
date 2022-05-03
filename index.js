@@ -147,12 +147,13 @@ const index = `<!doctype html>
 
 
 addEventListener('fetch', event => {
-        event.respondWith(handleRequest(event.request))
-    })
-    /**
-     * Respond with hello worker text
-     * @param {Request} request
-     */
+    event.respondWith(handleRequest(event.request))
+})
+
+/**
+ * Respond with hello worker text
+ * @param {Request} request
+ */
 
 async function handleRequest(request) {
     const { pathname } = new URL(request.url);
