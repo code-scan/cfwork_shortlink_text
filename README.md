@@ -21,7 +21,7 @@ const admin_path = '/short_link_admin'
 const api_path = '/short_api'
 ```
 
-去cf worker页面创建一个kv,并且把id填写到`wrangler.toml`里面,在进行发布
+去cf worker页面创建一个kv,并且把id填写到`wrangler.toml`里面,在进行发布,并把`wrangler.toml`中的`account_id`改成你自己的(通过`wrangler whoami`查看)
 
 
 ```
