@@ -179,7 +179,7 @@ async function handleRequest(request) {
 
         // rediret
         if (link['type'] == "link") {
-            return new Response.redirect(link['value'], 302);
+            return Response.redirect(link['value'], 302);
         } else {
             // textarea
             return new Response(`${link['value']}`, {
