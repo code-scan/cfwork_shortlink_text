@@ -124,7 +124,7 @@ const index = `<!doctype html>
 
         function getlink() {
             document.getElementById('result').innerHTML = "processing.."
-            const link = document.getElementById('link').value
+            let link = document.getElementById('link').value
             const name = document.getElementById('name').value
             const type = document.getElementById('select').value
             if (link.indexOf('http') == -1 && type == "link") {
@@ -181,7 +181,7 @@ async function handleRequest(request) {
     if (link != null) {
         link = JSON.parse(link)
 
-        // rediret
+        // redirect
         if (link['type'] == "link") {
             return Response.redirect(link['value'], 302);
         } else {
