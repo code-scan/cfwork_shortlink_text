@@ -1,10 +1,5 @@
-addEventListener('fetch', event => {
-        event.respondWith(handleRequest(event.request))
-    })
-    /**
-     * Respond with hello worker text
-     * @param {Request} request
-     */
+const admin_path = '/short_link_admin'
+const api_path = '/short_api'
 const index = `<!doctype html>
 <html lang="en">
 
@@ -135,7 +130,7 @@ const index = `<!doctype html>
             if (link.indexOf('http') == -1 && type == "link") {
                 link = 'http://' + link
             }
-            postData("/short", {
+            postData("${api_path}", {
                 "link": link,
                 "name": name,
                 "type": type
@@ -147,16 +142,27 @@ const index = `<!doctype html>
     </script>
 
 </html>`
+
+
+
+addEventListener('fetch', event => {
+        event.respondWith(handleRequest(event.request))
+    })
+    /**
+     * Respond with hello worker text
+     * @param {Request} request
+     */
+
 async function handleRequest(request) {
     const { pathname } = new URL(request.url);
     // index.html
-    if (pathname == "/short_link_admin") {
+    if (pathname == admin_path) {
         return new Response(index, {
             headers: { 'content-type': 'text/html' },
         })
     }
     // short api
-    if (pathname.startsWith("/short")) {
+    if (pathname.startsWith(api_path)) {
         const body = JSON.parse(await request.text());
 
         if (body['name'] == undefined || body['name'] == "" || body['name'].length < 2) {
