@@ -137,6 +137,7 @@ const index = `<!doctype html>
             }).then(resp => {
                 var url = document.location.protocol + '//' + document.location.host + '/' + resp.name
                 document.getElementById('result').innerHTML = url
+                document.getElementById('name').value = resp.name
             })
         }
     </script>
