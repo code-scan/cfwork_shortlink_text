@@ -178,6 +178,11 @@ async function handleRequest(request) {
         });
     }
     const key = pathname.replace('/', '')
+    if (key == "") {
+        return new Response(`403`, {
+            headers: { 'content-type': 'text/plain' },
+        })
+    }
     let link = await shortlink.get(key)
     if (link != null) {
         link = JSON.parse(link)
