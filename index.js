@@ -86,17 +86,18 @@ const index = `<!doctype html>
         <br>
         <main class="px-3">
             <p id="result" class="lead"></p>
-            <select class="form-control" id="select">
-                <option value="link">Link</option>
-                <option value="text">Text</option>
-            </select>
+
             <br>
             <div id="link_div" class="input-group mb-3">
-                <input type="text" id="link" class="form-control" placeholder="link" aria-label="link">
+                <!-- <input type="text" id="link" class="form-control" placeholder="link" aria-label="link"> -->
+                <select class="form-control" id="select">
+                    <option value="link">Link</option>
+                    <option value="text">Text</option>
+                </select>
                 <input type="text" id="name" placeholder="short code" class="input-group-text">
             </div>
             <div id="text_div">
-                <textarea id="text" class="form-control" rows="10"></textarea><br>
+                <textarea id="link" placeholder="link/text.." class="form-control" rows="10"></textarea><br>
             </div>
             <p class="lead">
                 <a href="#" onclick="getlink()" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Get</a>
@@ -128,14 +129,11 @@ const index = `<!doctype html>
 
         function getlink() {
             document.getElementById('result').innerHTML = "processing.."
-            let link = document.getElementById('link').value
+            const link = document.getElementById('link').value
             const name = document.getElementById('name').value
             const type = document.getElementById('select').value
             if (link.indexOf('http') == -1 && type == "link") {
                 link = 'http://' + link
-            }
-            if (type == "text") {
-                link = document.getElementById('text').value
             }
             postData("/short", {
                 "link": link,
