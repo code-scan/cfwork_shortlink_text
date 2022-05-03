@@ -73,7 +73,7 @@ const index = `<!doctype html>
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <header class="mb-auto">
             <div>
-                <h3 class="float-md-start mb-0">ShortLink</h3>
+                <h3 class="float-md-start mb-0">🔗 ShortLink</h3>
 
             </div>
         </header>
@@ -86,8 +86,8 @@ const index = `<!doctype html>
             <div id="link_div" class="input-group mb-3">
                 <!-- <input type="text" id="link" class="form-control" placeholder="link" aria-label="link"> -->
                 <select class="form-control" id="select">
-                    <option value="link">Link</option>
-                    <option value="text">Text</option>
+                    <option value="link">🔗 Link</option>
+                    <option value="text">📄 Text</option>
                 </select>
                 <input type="text" id="name" placeholder="short code" class="input-group-text">
             </div>
@@ -95,7 +95,7 @@ const index = `<!doctype html>
                 <textarea id="link" placeholder="link/text.." class="form-control" rows="10"></textarea><br>
             </div>
             <p class="lead">
-                <a href="#" onclick="getlink()" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Get</a>
+                <a href="#" onclick="getlink()" class="btn btn-lg btn-secondary fw-bold border-white bg-white">🚀 Get</a>
             </p>
         </main>
 
