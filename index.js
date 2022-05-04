@@ -160,7 +160,7 @@ async function handleRequest(request) {
     // index.html
     if (pathname == admin_path) {
         return new Response(index, {
-            headers: { 'content-type': 'text/html' },
+            headers: { 'content-type': 'text/html; charset=utf-8' },
         })
     }
     // short api
@@ -175,13 +175,13 @@ async function handleRequest(request) {
             "value": body['link']
         }))
         return new Response(JSON.stringify(body), {
-            headers: { "Content-Type": "text/plain" },
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
     }
     const key = pathname.replace('/', '')
     if (key == "") {
         return new Response(`403`, {
-            headers: { 'content-type': 'text/plain' },
+            headers: { 'content-type': 'text/plain; charset=utf-8' },
         })
     }
     let link = await shortlink.get(key)
@@ -194,11 +194,11 @@ async function handleRequest(request) {
         } else {
             // textarea
             return new Response(`${link['value']}`, {
-                headers: { 'content-type': 'text/plain' },
+                headers: { 'content-type': 'text/plain; charset=utf-8' },
             })
         }
     }
     return new Response(`403`, {
-        headers: { 'content-type': 'text/plain' },
+        headers: { 'content-type': 'text/plain; charset=utf-8' },
     })
 }
