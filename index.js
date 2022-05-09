@@ -1,7 +1,7 @@
 const admin_path = '/short_link_admin'
 const api_path = '/short_api'
-const url_key = 'link' // original url key
-const url_name = 'name' // short code  key
+const url_key = 'orgi_url' // original url key
+const url_name = 'short_code' // short code  key
 
 const index = `<!doctype html>
 <html lang="en">
@@ -138,9 +138,9 @@ const index = `<!doctype html>
                 "${url_name}": name,
                 "type": type
             }).then(resp => {
-                var url = document.location.protocol + '//' + document.location.host + '/' + resp.name
+                var url = document.location.protocol + '//' + document.location.host + '/' + resp['${url_name}']
                 document.getElementById('result').innerHTML = url
-                document.getElementById('name').value = resp.name
+                document.getElementById('name').value = resp['${url_name}']
             })
         }
     </script>
