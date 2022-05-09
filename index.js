@@ -1,5 +1,8 @@
 const admin_path = '/short_link_admin'
 const api_path = '/short_api'
+const url_key = 'link' // original url key
+const url_name = 'name' // short code  key
+
 const index = `<!doctype html>
 <html lang="en">
 
@@ -131,8 +134,8 @@ const index = `<!doctype html>
                 link = 'http://' + link
             }
             postData("${api_path}", {
-                "link": link,
-                "name": name,
+                "${url_key}": link,
+                "${url_name}": name,
                 "type": type
             }).then(resp => {
                 var url = document.location.protocol + '//' + document.location.host + '/' + resp.name
@@ -166,13 +169,18 @@ async function handleRequest(request) {
     // short api
     if (pathname.startsWith(api_path)) {
         const body = JSON.parse(await request.text());
-
-        if (body['name'] == undefined || body['name'] == "" || body['name'].length < 2) {
-            body['name'] = Math.random().toString(36).slice(-5)
+        console.log(body)
+        var short_type = 'link'
+        if (body['type'] != undefined && body['type'] != "") {
+            short_type = body['type'];
         }
-        await shortlink.put(body['name'], JSON.stringify({
-            "type": body['type'],
-            "value": body['link']
+
+        if (body[url_name] == undefined || body[url_name] == "" || body[url_name].length < 2) {
+            body[url_name] = Math.random().toString(36).slice(-5)
+        }
+        await shortlink.put(body[url_name], JSON.stringify({
+            "type": short_type,
+            "value": body[url_key]
         }))
         return new Response(JSON.stringify(body), {
             headers: { "Content-Type": "text/plain; charset=utf-8" },
@@ -187,8 +195,8 @@ async function handleRequest(request) {
     let link = await shortlink.get(key)
     if (link != null) {
         link = JSON.parse(link)
-
-        // redirect
+        console.log(link)
+            // redirect
         if (link['type'] == "link") {
             return Response.redirect(link['value'], 302);
         } else {
