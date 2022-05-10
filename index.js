@@ -2,6 +2,7 @@ const admin_path = '/short_link_admin'
 const api_path = '/short_api'
 const url_key = 'orgi_url' // original url key
 const url_name = 'short_code' // short code  key
+const short_url_key = 'short_url'; // full short url
 
 const index = `<!doctype html>
 <html lang="en">
@@ -159,7 +160,7 @@ addEventListener('fetch', event => {
  */
 
 async function handleRequest(request) {
-    const { pathname } = new URL(request.url);
+    const { protocol, hostname, pathname } = new URL(request.url);
     // index.html
     if (pathname == admin_path) {
         return new Response(index, {
@@ -182,6 +183,7 @@ async function handleRequest(request) {
             "type": short_type,
             "value": body[url_key]
         }))
+        body[short_url_key] = `${protocol}//${hostname}/${body[url_name]}`
         return new Response(JSON.stringify(body), {
             headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
