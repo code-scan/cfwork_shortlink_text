@@ -4,7 +4,6 @@ type = "webpack"
 account_id = "2b6b6ce7e733aa5c5f548f89ae8a8b1f"
 workers_dev = true
 route = "dark-field-6def.f5.workers.dev/*"
-zone_id = ""
 compatibility_date = "2022-05-03"
 
 kv_namespaces = [ 
