@@ -1,11 +1,11 @@
 name = "shortlink"
 type = "webpack"
 
-account_id = "2b6b6ce7e733aa5c5f548f89ae8a8b1f"
+account_id = "97ad16f52fc63a5b8dcefd19e69d6ee3"
 workers_dev = true
-route = "dark-field-6def.f5.workers.dev/*"
+route = "curl.ssshinchannn.workers.dev/*"
 compatibility_date = "2022-05-03"
 
 kv_namespaces = [ 
-  { binding = "shortlink", id = "fb25ca86743d4a10a5035d8972fbfa68" }
+  { binding = "shortlink", id = "dd09e4f4fa9a4fa7842df56d5a7a91c7" }
 ]
