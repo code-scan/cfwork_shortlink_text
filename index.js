@@ -4,6 +4,17 @@ const url_key = 'orgi_url' // original url key
 const url_name = 'short_code' // short code  key
 const short_url_key = 'short_url'; // full short url
 const expire_key = 'expire_time'; // expire time key
+const password_key = 'password'; // password key
+
+// Get current date in Shanghai timezone (YYYYMMDD)
+function getCurrentDate() {
+    const now = new Date();
+    const shanghaiOffset = 8 * 60; // Shanghai is UTC+8
+    const shanghaiTime = new Date(now.getTime() + shanghaiOffset * 60 * 1000);
+    return shanghaiTime.toISOString().slice(0, 10).replace(/-/g, '');
+}
+
+const defaultPassword = '123123'; // Default password is current date in YYYYMMDD format
 
 const index = `<!doctype html>
 <html lang="en">
@@ -69,11 +80,18 @@ const index = `<!doctype html>
 
     .progress {
         margin-top: 20px; /* Increased margin to avoid overlap */
+        margin-bottom: 20px;
         height: 20px;
     }
 
     .progress-bar {
         width: 0%;
+    }
+
+    #result {
+        cursor: pointer;
+        color: #0d6efd;
+        text-decoration: underline;
     }
 </style>
 
@@ -113,6 +131,9 @@ const index = `<!doctype html>
             <div id="text_div">
                 <textarea id="link" placeholder="link/text.." class="form-control" rows="10"></textarea><br>
             </div>
+            <div id="password_div" class="input-group mb-3">
+                <input type="password" id="password" placeholder="Password" class="form-control">
+            </div>
             <div id="file_div" style="display: none;">
                 <input type="file" id="file" class="form-control"><br>
                 <div class="progress">
@@ -120,7 +141,7 @@ const index = `<!doctype html>
                 </div>
             </div>
             <p class="lead">
-                <a href="#" onclick="getlink()" style="margin: 20px" class="btn btn-lg btn-secondary fw-bold border-white bg-white">🚀 Get</a>
+                <a href="#" onclick="getlink()" class="btn btn-lg btn-secondary fw-bold border-white bg-white">🚀 Get</a>
             </p>
         </main>
     </div>
@@ -152,11 +173,12 @@ const index = `<!doctype html>
             return response.json();
         }
 
-        async function postFile(url = '', file, expire) {
+        async function postFile(url = '', file, expire, password) {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('expire', expire);
             formData.append('filename', file.name); // Save original filename
+            formData.append('password', password); // Add password to form data
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
@@ -174,7 +196,7 @@ const index = `<!doctype html>
                     if (xhr.status === 200) {
                         resolve(JSON.parse(xhr.responseText));
                     } else {
-                        reject(new Error('Upload failed'));
+                        reject(new Error(xhr.responseText || 'Upload failed'));
                     }
                 };
                 xhr.onerror = function() {
@@ -189,6 +211,12 @@ const index = `<!doctype html>
             const type = document.getElementById('select').value;
             const name = document.getElementById('name').value;
             const expire = document.getElementById('expire').value;
+            const password = document.getElementById('password').value;
+
+            if (!password) {
+                document.getElementById('result').innerHTML = "Please enter the password.";
+                return;
+            }
 
             if (type === 'file') {
                 const file = document.getElementById('file').files[0];
@@ -196,12 +224,23 @@ const index = `<!doctype html>
                     document.getElementById('result').innerHTML = "Please select a file.";
                     return;
                 }
-                postFile("${api_path}", file, expire).then(resp => {
-                    var url = document.location.protocol + '//' + document.location.host + '/' + resp['${url_name}'];
-                    document.getElementById('result').innerHTML = url;
-                    document.getElementById('name').value = resp['${url_name}'];
+                postFile("${api_path}", file, expire, password).then(resp => {
+                    if (resp.error) {
+                        document.getElementById('result').innerHTML = resp.error;
+                    } else {
+                        var url = document.location.protocol + '//' + document.location.host + '/' + resp['${url_name}'];
+                        document.getElementById('result').innerHTML = url;
+                        document.getElementById('name').value = resp['${url_name}'];
+                        document.getElementById('result').onclick = function() {
+                            navigator.clipboard.writeText(url).then(function() {
+                                alert('Link copied to clipboard!');
+                            }, function(err) {
+                                console.error('Failed to copy: ', err);
+                            });
+                        };
+                    }
                 }).catch(error => {
-                    document.getElementById('result').innerHTML = "Upload failed: " + error.message;
+                    document.getElementById('result').innerHTML = error.message;
                 });
             } else {
                 let link = document.getElementById('link').value;
@@ -212,11 +251,25 @@ const index = `<!doctype html>
                     "${url_key}": link,
                     "${url_name}": name,
                     "type": type,
-                    "${expire_key}": expire
+                    "${expire_key}": expire,
+                    "${password_key}": password
                 }).then(resp => {
-                    var url = document.location.protocol + '//' + document.location.host + '/' + resp['${url_name}'];
-                    document.getElementById('result').innerHTML = url;
-                    document.getElementById('name').value = resp['${url_name}'];
+                    if (resp.error) {
+                        document.getElementById('result').innerHTML = resp.error;
+                    } else {
+                        var url = document.location.protocol + '//' + document.location.host + '/' + resp['${url_name}'];
+                        document.getElementById('result').innerHTML = url;
+                        document.getElementById('name').value = resp['${url_name}'];
+                        document.getElementById('result').onclick = function() {
+                            navigator.clipboard.writeText(url).then(function() {
+                                alert('Link copied to clipboard!');
+                            }, function(err) {
+                                console.error('Failed to copy: ', err);
+                            });
+                        };
+                    }
+                }).catch(error => {
+                    document.getElementById('result').innerHTML = error.message;
                 });
             }
         }
@@ -232,7 +285,7 @@ async function handleRequest(request) {
     const { protocol, hostname, pathname } = new URL(request.url);
 
     // index.html
-    if (pathname == admin_path) {
+    if (pathname == admin_path || pathname === '/') {
         return new Response(index, {
             headers: { 'content-type': 'text/html; charset=utf-8' },
         });
@@ -247,8 +300,16 @@ async function handleRequest(request) {
                 const file = formData.get('file');
                 const expire = formData.get('expire');
                 const filename = formData.get('filename'); // Get original filename
+                const password = formData.get('password'); // Get password
+
                 if (!file) {
                     return new Response(JSON.stringify({ error: 'No file uploaded' }), {
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                }
+
+                if (password !== defaultPassword) {
+                    return new Response(JSON.stringify({ error: 'Invalid password' }), {
                         headers: { 'Content-Type': 'application/json' },
                     });
                 }
@@ -279,6 +340,12 @@ async function handleRequest(request) {
                     body[url_name] = Math.random().toString(36).slice(-5);
                 }
 
+                if (body[password_key] !== defaultPassword) {
+                    return new Response(JSON.stringify({ error: 'Invalid password' }), {
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                }
+
                 const expireTime = body[expire_key] ? parseInt(body[expire_key]) * 60 : undefined; // Convert minutes to seconds
                 await shortlink.put(body[url_name], JSON.stringify({
                     "type": short_type,
@@ -290,6 +357,23 @@ async function handleRequest(request) {
                     headers: { "Content-Type": "text/plain; charset=utf-8" },
                 });
             }
+        } else if (request.method === 'PUT') {
+            // Handle PUT request for curl -T
+            const fileName = pathname.split('/').pop() || Math.random().toString(36).slice(-5);
+            const fileBuffer = await request.arrayBuffer();
+            const expireTime = 0; // Default to no expiration for curl uploads
+            await shortlink.put(fileName, JSON.stringify({
+                type: 'file',
+                value: fileBuffer,
+                filename: fileName // Use the generated name as the filename
+            }), { expirationTtl: expireTime });
+
+            return new Response(JSON.stringify({
+                [url_name]: fileName,
+                [short_url_key]: `${protocol}//${hostname}/${fileName}`
+            }), {
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
     }
 
@@ -325,5 +409,3 @@ async function handleRequest(request) {
         headers: { 'content-type': 'text/plain; charset=utf-8' },
     });
 }
-
-// ... existing code...
